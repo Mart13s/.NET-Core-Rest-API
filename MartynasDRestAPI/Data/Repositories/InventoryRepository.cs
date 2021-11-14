@@ -12,13 +12,14 @@ namespace MartynasDRestAPI.Data.Repositories
         Task<InventoryItem> Create(int inventoryID, InventoryItem invItem);
         Task Delete(int inventoryID, int id);
         Task<InventoryItem> Get(int inventoryID, int id);
+        Task<InventoryItem> GetByID(int id);
         Task<IEnumerable<InventoryItem>> GetAll(int inventoryID);
         Task<InventoryItem> Patch(int inventoryID, InventoryItem invItem);
     }
 
     public class InventoryRepository : IInventoryRepository
     {
-        private RestAPIContext _restApiContext;
+        private readonly RestAPIContext _restApiContext;
 
         public InventoryRepository(RestAPIContext restApiContext)
         {
@@ -48,6 +49,13 @@ namespace MartynasDRestAPI.Data.Repositories
             }
 
             return null;
+        }
+
+        public async Task<InventoryItem> GetByID(int id)
+        {
+
+                return await _restApiContext.inventoryItems.FirstOrDefaultAsync(o => o.id == id);
+     
         }
 
         public async Task<InventoryItem> Create(int inventoryID, InventoryItem invItem)

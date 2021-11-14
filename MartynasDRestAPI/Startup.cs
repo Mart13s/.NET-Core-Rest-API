@@ -25,6 +25,8 @@ namespace MartynasDRestAPI
             services.AddTransient<IPurchaseRepository, PurchaseRepository>();
             services.AddTransient<IInventoryRepository, InventoryRepository>();
             services.AddTransient<ITradeRepository, TradeRepository>();
+            services.AddTransient<IPurchaseItemsRepository, PurchaseItemsRepository>();
+            services.AddTransient<ITradeItemRepository, TradeItemRepository>();
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
         }

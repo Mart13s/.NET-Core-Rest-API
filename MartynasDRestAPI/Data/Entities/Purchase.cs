@@ -9,8 +9,11 @@ namespace MartynasDRestAPI.Data.Entities
     public class Purchase
     {
         public int id { get; set; }
+
+        [ForeignKey("buyer")]
+        public int buyerID { get; set; }
         public User buyer { get; set; }
-        public List<StoreItem> item { get; set; }
+        public List<PurchaseItem> items { get; set; }
         public Decimal totalCost { get; set; }
         public int totalItemCount { get; set; }
     }

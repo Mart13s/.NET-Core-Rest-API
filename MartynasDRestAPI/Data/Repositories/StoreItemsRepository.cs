@@ -18,7 +18,7 @@ namespace MartynasDRestAPI.Data.Repositories
 
     public class StoreItemsRepository : IStoreItemsRepository
     {
-        private RestAPIContext _restApiContext;
+        private readonly RestAPIContext _restApiContext;
 
         public StoreItemsRepository(RestAPIContext restApiContext)
         {

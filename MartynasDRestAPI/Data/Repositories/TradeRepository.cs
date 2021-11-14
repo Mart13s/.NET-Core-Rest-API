@@ -1,4 +1,5 @@
 ﻿using MartynasDRestAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,58 +18,30 @@ namespace MartynasDRestAPI.Data.Repositories
 
     public class TradeRepository : ITradeRepository
     {
+        private readonly RestAPIContext _restApiContext;
+
+        public TradeRepository(RestAPIContext restApiContext)
+        {
+            _restApiContext = restApiContext;
+        }
+
         public async Task<IEnumerable<Trade>> GetAll()
         {
-            return new List<Trade>()
-            {
-                new Trade()
-                {
-
-                id = 1,
-                senderUsername = "User 1",
-                receiverUsername = "User 2",
-                date = DateTime.Now,
-                receiverItems = new List<InventoryItem>(),
-                senderItems = new List<InventoryItem>(),
-                status = Trade.TradeState.accepted
-
-                },
-
-                new Trade()
-                {
-
-                id = 2,
-                senderUsername = "User 1",
-                receiverUsername = "User 2",
-                date = DateTime.Now,
-                receiverItems = new List<InventoryItem>(),
-                senderItems = new List<InventoryItem>(),
-                status = Trade.TradeState.accepted,
-                
-
-                 }
-
-            };
+            return await _restApiContext.trades.ToListAsync();
 
         }
 
         public async Task<Trade> Get(int id)
         {
-            return new Trade()
-            {
-                id = 1,
-                senderUsername = "User 1",
-                receiverUsername = "User 2",
-                date = DateTime.Now,
-                receiverItems = new List<InventoryItem>(),
-                senderItems = new List<InventoryItem>(),
-                status = Trade.TradeState.accepted
-
-            };
+            return await _restApiContext.trades.FirstOrDefaultAsync(o => o.id == id);
         }
 
         public async Task<Trade> Create(Trade trade)
         {
+            if (trade != null) _restApiContext.trades.Add(trade);
+
+            await _restApiContext.SaveChangesAsync();
+
             return trade;
         }
 
@@ -79,7 +52,12 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task Delete(int id)
         {
-            return;
+            var item = await _restApiContext.trades.FirstOrDefaultAsync(o => o.id == id);
+            if(item != null)
+            {
+                _restApiContext.trades.Remove(item);
+                await _restApiContext.SaveChangesAsync();
+            }
         }
     }
 }

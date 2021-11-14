@@ -13,6 +13,6 @@ namespace MartynasDRestAPI.Data.Entities
         public string imageUrl { get; set; }
 
         public Decimal price { get; set; }
-        public int qtyLeft { get; set; }
+        public int qty { get; set; }
     }
 }

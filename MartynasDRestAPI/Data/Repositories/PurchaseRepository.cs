@@ -1,4 +1,5 @@
 ﻿using MartynasDRestAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,169 +18,61 @@ namespace MartynasDRestAPI.Data.Repositories
 
     public class PurchaseRepository : IPurchaseRepository
     {
+
+        private readonly RestAPIContext _restApiContext;
+
+        public PurchaseRepository(RestAPIContext restAPIContext) 
+        {
+            _restApiContext = restAPIContext;
+        }
+
         public async Task<IEnumerable<Purchase>> GetAll()
         {
-            return new List<Purchase>
-            {
-                new Purchase() {
-
-                    id = 1,
-                    totalCost = 100.00m,
-                    totalItemCount = 2,
-
-                    item = new List<StoreItem>() {
-                
-                    new StoreItem
-                    {
-                    id = 1,
-                    itemName = "First item",
-                    description = "First item description",
-                    price = 1.00m,
-                    qtyLeft = 1,
-                    imageUrl = "No Image"
-
-                },
-
-                new StoreItem
-                {
-                    id = 2,
-                    itemName = "Second item",
-                    description = "Second item description",
-                    price = 2.00m,
-                    qtyLeft = 2,
-                    imageUrl = "No Image"
-
-                }
-
-                }
-
-                },
-
-                new Purchase() {
-
-                    id = 2,
-                    totalCost = 200.00m,
-                    totalItemCount = 2,
-
-                    item = new List<StoreItem>() {
-
-                        new StoreItem
-                        {
-                            id = 3,
-                            itemName = "Third item",
-                            description = "Third item description",
-                            price = 1.00m,
-                            qtyLeft = 1,
-                            imageUrl = "No Image"
-
-                        },
-
-                        new StoreItem
-                        {
-                            id = 4,
-                            itemName = "Fourth item",
-                            description = "Fourth item description",
-                            price = 2.00m,
-                            qtyLeft = 2,
-                            imageUrl = "No Image"
-
-                        }
-
-                    }
-
-                }
-
-
-            };
+            return await _restApiContext.purchases.ToListAsync();
         }
 
 
         public async Task<Purchase> Get(int id)
         {
-            return new Purchase()
-            {
-
-                id = 1,
-                totalCost = 100.00m,
-                totalItemCount = 2,
-
-                item = new List<StoreItem>()
-                {
-
-                    new StoreItem
-                    {
-                        id = 1,
-                        itemName = "First item",
-                        description = "First item description",
-                        price = 1.00m,
-                        qtyLeft = 1,
-                        imageUrl = "No Image"
-
-                    },
-
-                    new StoreItem
-                    {
-                        id = 2,
-                        itemName = "Second item",
-                        description = "Second item description",
-                        price = 2.00m,
-                        qtyLeft = 2,
-                        imageUrl = "No Image"
-
-                    }
-
-                }
-
-            };
+            return await _restApiContext.purchases.FirstOrDefaultAsync(o => o.id == id);
         }
         public async Task<Purchase> Create(Purchase p)
         {
-            return new Purchase()
+            if(p != default(Purchase))
             {
+                _restApiContext.purchases.Add(p);
+                await _restApiContext.SaveChangesAsync();
+                return p;
+            }
 
-                id = 33,
-                totalCost = 155.18m,
-                totalItemCount = 48,
-
-                item = new List<StoreItem>()
-                {
-
-                    new StoreItem
-                    {
-                        id = 1,
-                        itemName = "First item",
-                        description = "First item description",
-                        price = 1.00m,
-                        qtyLeft = 1,
-                        imageUrl = "No Image"
-
-                    },
-
-                    new StoreItem
-                    {
-                        id = 2,
-                        itemName = "Second item",
-                        description = "Second item description",
-                        price = 2.00m,
-                        qtyLeft = 2,
-                        imageUrl = "No Image"
-
-                    }
-
-                }
-
-            };
+            return null;
 
         }
 
         public async Task<Purchase> Patch(int id, Purchase p)
         {
-            return p;
+            var purchase = await _restApiContext.purchases.FirstOrDefaultAsync(o => o.id == id);
+
+            if(purchase != null && p != null && p.buyer == purchase.buyer)
+            {
+                purchase = p;
+                await _restApiContext.SaveChangesAsync();
+                return p;
+            }
+
+            return null;
 
         }
 
         public async Task Delete(int id)
         {
+            var purchase = await _restApiContext.purchases.FirstOrDefaultAsync(o => o.id == id);
+
+            if(purchase != null)
+            {
+                _restApiContext.Remove(purchase);
+                await _restApiContext.SaveChangesAsync();
+            }
 
         }
     }

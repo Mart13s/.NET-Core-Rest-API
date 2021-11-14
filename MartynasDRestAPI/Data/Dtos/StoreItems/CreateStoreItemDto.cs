@@ -10,7 +10,7 @@ namespace MartynasDRestAPI.Data.Dtos
         [Required]string itemName,
         [Required]string description,
         [Required]Decimal price,
-        int qtyLeft,
+        int qty,
         string imageUrl
         );
 }

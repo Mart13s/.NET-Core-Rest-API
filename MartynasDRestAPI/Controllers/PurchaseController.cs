@@ -17,48 +17,188 @@ namespace MartynasDRestAPI.Controllers
     public class PurchaseController : ControllerBase
     {
         private readonly IPurchaseRepository _purchaseRepository;
+        private readonly IUsersRepository _usersRepository;
+        private readonly IStoreItemsRepository _storeItemsRepository;
+        private readonly IPurchaseItemsRepository _purchaseItemsRepository;
         private readonly IMapper _mapper;
 
-        public PurchaseController(IPurchaseRepository purchaseRepository, IMapper mapper)
+        public PurchaseController(IPurchaseItemsRepository purchaseItemsRepository, IPurchaseRepository purchaseRepository, IUsersRepository usersRepository, IStoreItemsRepository storeItemsRepository, IMapper mapper)
         {
+            _purchaseItemsRepository = purchaseItemsRepository;
             _purchaseRepository = purchaseRepository;
+            _usersRepository = usersRepository;
+            _storeItemsRepository = storeItemsRepository;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<PurchaseDto>> GetAll()
+        public async Task<ActionResult<IEnumerable<PurchaseDto>>> GetAll()
         {
-            return (await _purchaseRepository.GetAll()).Select(o => _mapper.Map<PurchaseDto>(o));
+            var purchases = (await _purchaseRepository.GetAll());
+            List<PurchaseDto> dtos = new List<PurchaseDto>();
+          
+            foreach(var p in purchases)
+            {
+
+                PurchaseDto pdto = new PurchaseDto()
+                {
+                    id = p.id,
+                    buyerID = p.buyerID,
+                    totalCost = p.totalCost,
+                    totalItemCount = p.totalItemCount,
+                    items = new List<StoreItemDto>()
+                };
+
+                var purchaseItems = await _purchaseItemsRepository.GetAll(p.id);
+
+                foreach(var purchaseItem in purchaseItems)
+                {
+                    var storeItem = await _storeItemsRepository.Get(purchaseItem.storeItemID);
+                    StoreItemDto dto = new StoreItemDto()
+                    {
+                        id = storeItem.id,
+                        imageUrl = storeItem.imageUrl,
+                        description = storeItem.description,
+                        itemName = storeItem.itemName,
+                        price = storeItem.price,
+                        qty = purchaseItem.count
+                    };
+
+                    pdto.items.Add(dto);
+                }
+
+                dtos.Add(pdto);
+            }
+
+            return Ok(dtos);
+
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PurchaseDto>> Get(int id)
         {
-            var purchase = _purchaseRepository.Get(id);
-            if (purchase == null) return NotFound($" Purchase with an id {id} was not found.");
+            var p = await _purchaseRepository.Get(id);
+            if (p == null) return NotFound($" Purchase with id {id} not found. ");
 
-            return _mapper.Map<PurchaseDto>(await _purchaseRepository.Get(id));
+            PurchaseDto pdto = new PurchaseDto()
+            {
+                id = p.id,
+                buyerID = p.buyerID,
+                totalCost = p.totalCost,
+                totalItemCount = p.totalItemCount,
+                items = new List<StoreItemDto>()
+            };
+
+            var purchaseItems = await _purchaseItemsRepository.GetAll(p.id);
+
+            foreach (var purchaseItem in purchaseItems)
+            {
+                var storeItem = await _storeItemsRepository.Get(purchaseItem.storeItemID);
+                StoreItemDto dto = new StoreItemDto()
+                {
+                    id = storeItem.id,
+                    imageUrl = storeItem.imageUrl,
+                    description = storeItem.description,
+                    itemName = storeItem.itemName,
+                    price = storeItem.price,
+                    qty = purchaseItem.count
+                };
+
+                pdto.items.Add(dto);
+            }
+
+            return Ok(pdto);
+
         }
 
         [HttpPost]
-        public async Task<ActionResult<PurchaseDto>> Create(PurchaseDto dto)
+        public async Task<ActionResult<PurchaseDto>> Create(CreatePurchaseDto dto)
         {
-            var purchase = _mapper.Map<Purchase>(dto);
-            await _purchaseRepository.Create(purchase);
+            int userid = dto.buyerID;
+            var buyer = await _usersRepository.Get(userid);
+            if (buyer == default(User)) return NotFound($" User with id {userid} not found.");
 
-            return Created($"/api/purchases/{purchase.id}",_mapper.Map<PurchaseDto>(purchase));
+            if (dto == null || dto.items.Count == 0) return BadRequest(" No items in purchase. ");
+
+            Purchase purchase = new Purchase();
+            purchase.buyerID = userid;
+            var p = await _purchaseRepository.Create(purchase);
+            
+
+            foreach (StoreItemDto storeItem in dto.items)
+            {
+               
+                var currentItem = await _storeItemsRepository.Get(storeItem.id);
+                if (currentItem == null) return NotFound($" Store item with id {storeItem.id} not found. ");
+
+                var purchaseItem = await _purchaseItemsRepository.Create(
+                    new PurchaseItem()
+                    {
+                        purchaseID = p.id,
+                        storeItemID = currentItem.id,
+                        count = currentItem.qty
+                    });
+
+                if (purchaseItem == null) return BadRequest($" Purchase item already exists. ");
+                //p.items.Add(purchaseItem);
+            }
+
+            var purchaseDto = new PurchaseDto();
+            purchaseDto.id = p.id;
+            purchaseDto.buyerID = userid;
+            purchaseDto.totalCost = 0;
+            purchaseDto.totalItemCount = 0;
+
+            purchaseDto.items = new List<StoreItemDto>();
+            purchaseDto.items.Clear();
+
+            foreach(var storeItem in purchase.items)
+            {
+
+                purchaseDto.totalItemCount += 1;
+                var storeItem2 = (await _storeItemsRepository.Get(storeItem.storeItemID));
+                purchaseDto.totalCost += storeItem2.price * storeItem.count;
+
+                
+                purchaseDto.items.Add(new StoreItemDto()
+                {
+                    id = storeItem2.id,
+                    itemName = storeItem2.itemName,
+                    qty = storeItem.count,
+                    description = storeItem2.description,
+                    price = storeItem2.price,
+                    imageUrl = storeItem2.imageUrl
+                });
+                
+            }
+
+            p.totalCost = purchaseDto.totalCost;
+            p.totalItemCount = purchaseDto.totalItemCount;
+            p.items = purchase.items;
+            p.buyer = buyer;
+            await _purchaseRepository.Patch(p.id, p);
+
+            return Created($"/api/purchases/{purchase.id}", purchaseDto);
+
+            
         }
 
         [HttpPatch("{id}")]
         public async Task<ActionResult<PurchaseDto>> Patch(int id, PurchaseDto dto)
         {
+            int userid = dto.buyerID;
+            var buyer = await _usersRepository.Get(userid);
+            if (buyer == default(User)) return NotFound($" User with id {userid} not found.");
+
             var purchase = await _purchaseRepository.Get(id);
             if (purchase == null) return NotFound($" Purchase item with id '{id}' not found.");
 
-            _mapper.Map(dto, purchase);
-            await _purchaseRepository.Patch(id, purchase);
+            var patchingPurchase = _mapper.Map<Purchase>(dto);
+            patchingPurchase.buyer = buyer;
+            
+            await _purchaseRepository.Patch(id, patchingPurchase);
 
-            return Ok(_mapper.Map<PurchaseDto>(purchase));
+            return Ok(dto);
 
         }
 
@@ -68,6 +208,7 @@ namespace MartynasDRestAPI.Controllers
             var purchase = await _purchaseRepository.Get(id);
             if (purchase == null) return NotFound($" Purchase with id {id} not found.");
 
+            await _purchaseItemsRepository.DeletePurchase(id);
             await _purchaseRepository.Delete(id);
 
             // 204

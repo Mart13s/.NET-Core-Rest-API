@@ -6,9 +6,17 @@ using MartynasDRestAPI.Data.Entities;
 
 namespace MartynasDRestAPI.Data.Dtos
 {
-    public record PurchaseDto(
-    List<StoreItemDto> items,
-    Decimal totalCost,
-    int totalItemCount
-    );
+    public class PurchaseDto { 
+    public int id { get; set; }
+    public int buyerID { get; set; } 
+    public List<StoreItemDto> items { get; set; }
+    public Decimal totalCost { get; set; }
+    public int totalItemCount { get; set; }
+
+    public PurchaseDto()
+     {
+
+     }
+    
+    }
 }

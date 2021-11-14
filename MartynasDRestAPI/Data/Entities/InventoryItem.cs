@@ -9,6 +9,9 @@ namespace MartynasDRestAPI.Data.Entities
     public class InventoryItem
     {
         public int id { get; set; }
+
+        [ForeignKey("owner")]
+        public int ownerID { get; set; }
         public User owner { get; set; }
         public string itemName { get; set; }
         public string description { get; set; }

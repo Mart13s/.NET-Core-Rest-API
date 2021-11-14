@@ -7,14 +7,23 @@ using static MartynasDRestAPI.Data.Entities.Trade;
 
 namespace MartynasDRestAPI.Data.Dtos
 {
-    public record TradeDto
-    (
-        string senderUsername,
-        string receiverUsername,
-        DateTime date,
-        List<InventoryItemDto> senderItems,
-        List<InventoryItemDto> receiverItems,
-        TradeState status
+    public class TradeDto
+    {
+        public int id { get; set; }
+        public int senderID { get; set; }
+        public int receiverID { get; set; }
+        public DateTime date { get; set; }
+        public List<int> senderItems { get; set; }
+        public List<int> receiverItems { get; set; }
+        public TradeState status
+        {
+            get; set;
+        }
 
-    );
+        public TradeDto()
+        {
+
+        }
+
+    }
 }

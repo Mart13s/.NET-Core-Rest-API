@@ -47,8 +47,11 @@ namespace MartynasDRestAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<InventoryItemDto>> Create(int userID, InventoryItemDto dto)
         {
-            if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
+            var usr = await _userRepository.Get(userID);
+            if (usr == null) return NotFound($" User with id {userID} not found. ");
             var invItem = _mapper.Map<InventoryItem>(dto);
+            invItem.owner = usr;
+            invItem.ownerID = userID;
             await _inventoryRepository.Create(userID, invItem);
 
             // 201 Created
@@ -58,7 +61,9 @@ namespace MartynasDRestAPI.Controllers
         [HttpPatch("{id}")]
         public async Task<ActionResult<InventoryItemDto>> Patch(int userID, int id, InventoryItemDto dto)
         {
-            if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
+            var usr = await _userRepository.Get(userID);
+            if (usr == null) return NotFound($" User with id {userID} not found. ");
+
             var invItem = await _inventoryRepository.Get(userID, id);
             if (invItem == null) return NotFound($" Inventory item with id {id} not found.");
 
@@ -66,6 +71,8 @@ namespace MartynasDRestAPI.Controllers
 
             // Setting id prior to patching
             invItem.id = id;
+            invItem.ownerID = userID;
+            invItem.owner = usr;
 
             await _inventoryRepository.Patch(userID, invItem);
 

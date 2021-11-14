@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MartynasDRestAPI.Data.Dtos
 {
-    public record InventoryItemDto(
-     
-        int id,
-        string itemName,
-        string description,
-        string imageUrl
-        );
+    public class InventoryItemDto {
+
+        public int id { get; set; }
+        public string itemName { get; set; }
+        public string description { get; set; }
+        public string imageUrl { get; set; }
+      }
 }

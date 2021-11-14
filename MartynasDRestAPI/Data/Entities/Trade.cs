@@ -18,12 +18,12 @@ namespace MartynasDRestAPI.Data.Entities
 
         public int id { get; set; }
         public DateTime date { get; set; }
-        public User sender { get; set; }
-        public User receiver { get; set; }
-        public string senderUsername { get; set; }
-        public string receiverUsername { get; set; }
-        public List<InventoryItem> senderItems { get; set; }
-        public List<InventoryItem> receiverItems { get; set; }
+        public int senderID { get; set; }
+        public int receiverID { get; set; }
+        [NotMapped]
+        public List<TradeItem> senderItems { get; set; }
+        [NotMapped]
+        public List<TradeItem> receiverItems { get; set; }
         public TradeState status { get; set; }
 
     }

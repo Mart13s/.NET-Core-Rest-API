@@ -1,4 +1,5 @@
 ﻿using MartynasDRestAPI.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,59 +12,121 @@ namespace MartynasDRestAPI.Data.Repositories
         Task<IEnumerable<Review>> GetAll(int storeItemId);
         Task<Review> Get(int storeItemId, int reviewId);
         Task<Review> Create(Review review);
-        Task<Review> Patch(Review r);
-        Task Delete(int id);
+        Task<Review> Patch(int id, Review r);
+        Task Delete(int storeItemID, int id);
     }
 
     public class ReviewsRepository : IReviewsRepository
     {
+
+        private readonly RestAPIContext _restContext;
+
+        public ReviewsRepository(RestAPIContext restContext)
+        {
+            _restContext = restContext;
+        }
+
         public async Task<IEnumerable<Review>> GetAll(int storeItemId)
         {
-            return new List<Review>()
-            {
-                new Review()
-                {
-                    id = 1,
-                    rating = 10,
-                    reviewText = "Good first item review.",
-                },
+            var storeItem = await _restContext.storeItems.FirstOrDefaultAsync(o => o.id == storeItemId);
 
-                new Review()
-                {
-                    id = 2,
-                    rating = 5,
-                    reviewText = "Good second item review.",
-                }
-            };
+            if(storeItem != null)
+            {
+
+                return await _restContext.reviews.Where(o => o.item == storeItem).ToListAsync();
+
+            }
+
+            return null;
+
         }
 
 
         public async Task<Review> Get(int storeItemId, int reviewId)
         {
-            return
-                new Review()
-                {
-                    id = reviewId,
-                    rating = 8,
-                    reviewText = "Good Third item review.",
-                };
+
+            var storeItem = await _restContext.storeItems.FirstOrDefaultAsync(o => o.id == storeItemId);
+
+            if (storeItem != null)
+            {
+                return await _restContext.reviews.FirstOrDefaultAsync(o => o.item == storeItem && o.id == reviewId);
+              
+            }
+
+            return null;
 
         }
+
         public async Task<Review> Create(Review review)
         {
-            return review;
+            if (review == null || review.item == null) return null;
 
+            var storeItem = await _restContext.storeItems.FirstOrDefaultAsync(o => o.id == review.item.id);
+            
+            if (storeItem != null)
+            {
+
+                _restContext.reviews.Add(review);
+                await _restContext.SaveChangesAsync();
+
+                return review;
+
+            }
+
+            return null;
         }
 
-        public async Task<Review> Patch(Review r)
+        public async Task<Review> Patch(int id, Review review)
         {
-            return r;
+
+            if (review == null || review.item == null) return null;
+
+            var storeItem = await _restContext.storeItems.FirstOrDefaultAsync(o => o.id == review.item.id);
+
+            if (storeItem != null)
+            {
+
+                var reviewToPatch = await _restContext.reviews.FirstOrDefaultAsync(o => o.id == id);
+                
+                if(reviewToPatch != null)
+                {
+                    review.id = id;
+                    reviewToPatch = review;
+
+                    await _restContext.SaveChangesAsync();
+
+                    return review;
+
+
+                }
+
+            }
+
+            return null;
 
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int storeItemID, int id)
         {
 
+            var storeItem = await _restContext.storeItems.FirstOrDefaultAsync(o => o.id == storeItemID);
+
+            if(storeItem != null)
+            {
+
+                var reviewToRemove = await _restContext.reviews.FirstOrDefaultAsync(o => o.id == id);
+
+                if( reviewToRemove != null )
+                {
+                    _restContext.reviews.Remove(reviewToRemove);
+                    await _restContext.SaveChangesAsync();
+                } 
+
+
+            }
+
+
         }
+
     }
 }

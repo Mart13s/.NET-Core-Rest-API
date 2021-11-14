@@ -22,11 +22,16 @@ namespace MartynasDRestAPI.Data
             CreateMap<Review, ReviewDto>();
             CreateMap<CreateReviewDto, Review>();
 
-            CreateMap<Purchase, PurchaseDto>();
-            CreateMap<PurchaseDto, Purchase>();
+            CreateMap<Purchase, PurchaseDto>()
+                .ForSourceMember(source => source.items, opt => opt.DoNotValidate());
+            CreateMap<PurchaseDto, Purchase>()
+                .ForSourceMember(source => source.buyerID, opt => opt.DoNotValidate())
+                .ForSourceMember(source => source.items, opt => opt.DoNotValidate());
+            CreateMap<CreatePurchaseDto, Purchase>()
+                .ForSourceMember(source => source.buyerID, opt => opt.DoNotValidate())
+                .ForSourceMember(source => source.items, opt => opt.DoNotValidate());
 
             CreateMap<Trade, TradeDto>();
-            CreateMap<CreateTradeDto, Trade>();
 
             CreateMap<InventoryItem, InventoryItemDto>();
             CreateMap<InventoryItemDto, InventoryItem>();

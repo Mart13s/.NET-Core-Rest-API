@@ -26,12 +26,6 @@ namespace MartynasDRestAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("Tradeid")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Tradeid1")
-                        .HasColumnType("int");
-
                     b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
@@ -41,16 +35,12 @@ namespace MartynasDRestAPI.Migrations
                     b.Property<string>("itemName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ownerid")
+                    b.Property<int>("ownerID")
                         .HasColumnType("int");
 
                     b.HasKey("id");
 
-                    b.HasIndex("Tradeid");
-
-                    b.HasIndex("Tradeid1");
-
-                    b.HasIndex("ownerid");
+                    b.HasIndex("ownerID");
 
                     b.ToTable("inventoryItems");
                 });
@@ -62,7 +52,7 @@ namespace MartynasDRestAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("buyerid")
+                    b.Property<int>("buyerID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("totalCost")
@@ -73,9 +63,27 @@ namespace MartynasDRestAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("buyerid");
+                    b.HasIndex("buyerID");
 
                     b.ToTable("purchases");
+                });
+
+            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.PurchaseItem", b =>
+                {
+                    b.Property<int>("purchaseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("storeItemID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("count")
+                        .HasColumnType("int");
+
+                    b.HasKey("purchaseID", "storeItemID");
+
+                    b.HasIndex("storeItemID");
+
+                    b.ToTable("purchaseItems");
                 });
 
             modelBuilder.Entity("MartynasDRestAPI.Data.Entities.Review", b =>
@@ -111,9 +119,6 @@ namespace MartynasDRestAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("Purchaseid")
-                        .HasColumnType("int");
-
                     b.Property<string>("description")
                         .HasColumnType("nvarchar(max)");
 
@@ -126,12 +131,10 @@ namespace MartynasDRestAPI.Migrations
                     b.Property<decimal>("price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("qtyLeft")
+                    b.Property<int>("qty")
                         .HasColumnType("int");
 
                     b.HasKey("id");
-
-                    b.HasIndex("Purchaseid");
 
                     b.ToTable("storeItems");
                 });
@@ -146,16 +149,10 @@ namespace MartynasDRestAPI.Migrations
                     b.Property<DateTime>("date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("receiverUsername")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("receiverid")
+                    b.Property<int>("receiverID")
                         .HasColumnType("int");
 
-                    b.Property<string>("senderUsername")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("senderid")
+                    b.Property<int>("senderID")
                         .HasColumnType("int");
 
                     b.Property<int>("status")
@@ -163,11 +160,20 @@ namespace MartynasDRestAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("receiverid");
-
-                    b.HasIndex("senderid");
-
                     b.ToTable("trades");
+                });
+
+            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.TradeItem", b =>
+                {
+                    b.Property<int>("tradeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("itemID")
+                        .HasColumnType("int");
+
+                    b.HasKey("tradeID", "itemID");
+
+                    b.ToTable("tradeItems");
                 });
 
             modelBuilder.Entity("MartynasDRestAPI.Data.Entities.User", b =>
@@ -205,17 +211,11 @@ namespace MartynasDRestAPI.Migrations
 
             modelBuilder.Entity("MartynasDRestAPI.Data.Entities.InventoryItem", b =>
                 {
-                    b.HasOne("MartynasDRestAPI.Data.Entities.Trade", null)
-                        .WithMany("receiverItems")
-                        .HasForeignKey("Tradeid");
-
-                    b.HasOne("MartynasDRestAPI.Data.Entities.Trade", null)
-                        .WithMany("senderItems")
-                        .HasForeignKey("Tradeid1");
-
                     b.HasOne("MartynasDRestAPI.Data.Entities.User", "owner")
                         .WithMany()
-                        .HasForeignKey("ownerid");
+                        .HasForeignKey("ownerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("owner");
                 });
@@ -224,9 +224,30 @@ namespace MartynasDRestAPI.Migrations
                 {
                     b.HasOne("MartynasDRestAPI.Data.Entities.User", "buyer")
                         .WithMany()
-                        .HasForeignKey("buyerid");
+                        .HasForeignKey("buyerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("buyer");
+                });
+
+            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.PurchaseItem", b =>
+                {
+                    b.HasOne("MartynasDRestAPI.Data.Entities.Purchase", "purchase")
+                        .WithMany("items")
+                        .HasForeignKey("purchaseID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MartynasDRestAPI.Data.Entities.StoreItem", "storeItem")
+                        .WithMany()
+                        .HasForeignKey("storeItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("purchase");
+
+                    b.Navigation("storeItem");
                 });
 
             modelBuilder.Entity("MartynasDRestAPI.Data.Entities.Review", b =>
@@ -238,38 +259,9 @@ namespace MartynasDRestAPI.Migrations
                     b.Navigation("item");
                 });
 
-            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.StoreItem", b =>
-                {
-                    b.HasOne("MartynasDRestAPI.Data.Entities.Purchase", null)
-                        .WithMany("item")
-                        .HasForeignKey("Purchaseid");
-                });
-
-            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.Trade", b =>
-                {
-                    b.HasOne("MartynasDRestAPI.Data.Entities.User", "receiver")
-                        .WithMany()
-                        .HasForeignKey("receiverid");
-
-                    b.HasOne("MartynasDRestAPI.Data.Entities.User", "sender")
-                        .WithMany()
-                        .HasForeignKey("senderid");
-
-                    b.Navigation("receiver");
-
-                    b.Navigation("sender");
-                });
-
             modelBuilder.Entity("MartynasDRestAPI.Data.Entities.Purchase", b =>
                 {
-                    b.Navigation("item");
-                });
-
-            modelBuilder.Entity("MartynasDRestAPI.Data.Entities.Trade", b =>
-                {
-                    b.Navigation("receiverItems");
-
-                    b.Navigation("senderItems");
+                    b.Navigation("items");
                 });
 #pragma warning restore 612, 618
         }
