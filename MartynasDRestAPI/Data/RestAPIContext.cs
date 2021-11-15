@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MartynasDRestAPI.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using MartynasDRestAPI.Data.Dtos.Auth;
+using Microsoft.AspNetCore.Identity;
 
 namespace MartynasDRestAPI.Data
 {
-    public class RestAPIContext : DbContext
+    public class RestAPIContext : IdentityDbContext<RestUser>
     {
-        public DbSet<User> users { get; set; }
+        public DbSet<RestUser> identityUsers { get; set; }
+        public DbSet<UserInternal> users { get; set; }
         public DbSet<InventoryItem> inventoryItems { get; set; }
         public DbSet<StoreItem> storeItems { get; set; }
         public DbSet<Purchase> purchases { get; set; }
@@ -20,14 +24,16 @@ namespace MartynasDRestAPI.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=MartynasDRestAPI");
+            optionsBuilder.UseSqlServer("Data Source=tcp:martynasdrestapidbserver.database.windows.net,1433;Initial Catalog=MartynasDRestAPI_db;User Id=AdminUser@martynasdrestapidbserver;Password=BruhBruh123");
         }
 
         // Overriding for composite keys
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<PurchaseItem>().HasKey(o => new { o.purchaseID, o.storeItemID });
             modelBuilder.Entity<TradeItem>().HasKey(o => new { o.tradeID, o.itemID });
+
         }
     }
 }

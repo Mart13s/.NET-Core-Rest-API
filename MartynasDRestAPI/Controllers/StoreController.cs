@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
@@ -25,12 +27,14 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<IEnumerable<StoreItemDto>> GetAll()
         {
             return (await _storeRepository.GetAll()).Select(o => _mapper.Map<StoreItemDto>(o));
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<StoreItemDto>> Get(int id)
         {
             var storeItem = await _storeRepository.Get(id);
@@ -39,6 +43,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<StoreItemDto>> Post(CreateStoreItemDto dto)
         {
             var storeItem = _mapper.Map<StoreItem>(dto);
@@ -63,6 +68,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<StoreItemDto>> Delete(int id)
         {
             var storeItem = await _storeRepository.Get(id);

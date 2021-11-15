@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.Configuration.Annotations;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MartynasDRestAPI.Controllers
@@ -32,6 +34,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<PurchaseDto>>> GetAll()
         {
             var purchases = (await _purchaseRepository.GetAll());
@@ -75,6 +78,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<PurchaseDto>> Get(int id)
         {
             var p = await _purchaseRepository.Get(id);
@@ -112,11 +116,12 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<PurchaseDto>> Create(CreatePurchaseDto dto)
         {
             int userid = dto.buyerID;
             var buyer = await _usersRepository.Get(userid);
-            if (buyer == default(User)) return NotFound($" User with id {userid} not found.");
+            if (buyer == default(UserInternal)) return NotFound($" User with id {userid} not found.");
 
             if (dto == null || dto.items.Count == 0) return BadRequest(" No items in purchase. ");
 
@@ -184,11 +189,12 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<PurchaseDto>> Patch(int id, PurchaseDto dto)
         {
             int userid = dto.buyerID;
             var buyer = await _usersRepository.Get(userid);
-            if (buyer == default(User)) return NotFound($" User with id {userid} not found.");
+            if (buyer == default(UserInternal)) return NotFound($" User with id {userid} not found.");
 
             var purchase = await _purchaseRepository.Get(id);
             if (purchase == null) return NotFound($" Purchase item with id '{id}' not found.");
@@ -203,6 +209,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<PurchaseDto>> Delete(int id)
         {
             var purchase = await _purchaseRepository.Get(id);

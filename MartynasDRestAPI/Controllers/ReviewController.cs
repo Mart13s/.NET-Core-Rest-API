@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.Configuration.Annotations;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MartynasDRestAPI.Controllers
@@ -29,6 +31,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetAll(int storeItemId)
         {
             if (await _storeRepository.Get(storeItemId) == null) return NotFound($" Store item with id {storeItemId} not found. ");
@@ -38,6 +41,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<ReviewDto>> Get(int storeItemId, int id)
         {
             var store = await _storeRepository.Get(storeItemId);
@@ -51,6 +55,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<ReviewDto>> Create(int storeItemId, CreateReviewDto dto )
         {
             var store = await _storeRepository.Get(storeItemId);
@@ -66,6 +71,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<ReviewDto>> Patch(int storeItemId, int id, CreateReviewDto dto)
         {
 
@@ -85,6 +91,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult> Delete(int storeItemId, int id)
         {
             var store = await _storeRepository.Get(storeItemId);

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -31,6 +33,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<TradeDto>>> GetAll()
         {
             var trades = await _tradeRepository.GetAll();
@@ -74,6 +77,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer)]
         public async Task<ActionResult<TradeDto>> Get(int id)
         {
             var t = await _tradeRepository.Get(id);
@@ -109,6 +113,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer)]
         public async Task<ActionResult<TradeDto>> Post(TradeDto dto)
         {
 
@@ -173,6 +178,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<TradeDto>> Delete(int id)
         {
             var trade = await _tradeRepository.Get(id);

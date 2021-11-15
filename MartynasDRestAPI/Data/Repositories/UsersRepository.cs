@@ -9,10 +9,10 @@ namespace MartynasDRestAPI.Data.Repositories
 {
     public interface IUsersRepository
     {
-        Task<IEnumerable<User>> GetAll();
-        Task<User> Get(int id);
-        Task<User> Create(User u);
-        Task<User> Patch(int id, User u);
+        Task<IEnumerable<UserInternal>> GetAll();
+        Task<UserInternal> Get(int id);
+        Task<UserInternal> Create(UserInternal u);
+        Task<UserInternal> Patch(int id, UserInternal u);
         Task Delete(int id);
     }
 
@@ -26,18 +26,18 @@ namespace MartynasDRestAPI.Data.Repositories
             _restApiContext = restApiContext;
         }
 
-        public async Task<IEnumerable<User>> GetAll()
+        public async Task<IEnumerable<UserInternal>> GetAll()
         {
             return await _restApiContext.users.ToListAsync();
         }
 
      
-        public async Task<User> Get(int id)
+        public async Task<UserInternal> Get(int id)
         {
             return await _restApiContext.users.FirstOrDefaultAsync(o => o.id == id);
 
         }
-        public async Task<User> Create(User u)
+        public async Task<UserInternal> Create(UserInternal u)
         {
             _restApiContext.users.Add(u);
             await _restApiContext.SaveChangesAsync();
@@ -46,11 +46,11 @@ namespace MartynasDRestAPI.Data.Repositories
 
         }
 
-        public async Task<User> Patch(int id, User u)
+        public async Task<UserInternal> Patch(int id, UserInternal u)
         {
             var userToUpdate = _restApiContext.users.FirstOrDefault(o => o.id == id);
             
-            if(userToUpdate != default(User))
+            if(userToUpdate != default(UserInternal))
             {
                 userToUpdate = u;
                 await _restApiContext.SaveChangesAsync();
@@ -69,7 +69,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = _restApiContext.users.FirstOrDefault(o => o.id == id);
 
-            if(user != default(User))
+            if(user != default(UserInternal))
             {
                 _restApiContext.Remove(user);
                 await _restApiContext.SaveChangesAsync();

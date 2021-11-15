@@ -12,7 +12,7 @@ namespace MartynasDRestAPI.Data.Entities
 
         [ForeignKey("owner")]
         public int ownerID { get; set; }
-        public User owner { get; set; }
+        public UserInternal owner { get; set; }
         public string itemName { get; set; }
         public string description { get; set; }
         public string imageUrl { get; set; }

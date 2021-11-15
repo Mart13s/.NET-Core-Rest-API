@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MartynasDRestAPI.Data.Dtos;
+using MartynasDRestAPI.Data.Dtos.Auth;
 using MartynasDRestAPI.Data.Entities;
 
 namespace MartynasDRestAPI.Data
@@ -12,9 +13,9 @@ namespace MartynasDRestAPI.Data
     {
         public RestAPIProfile()
         {
-            CreateMap<User, UserDto>();
-            CreateMap<CreateUserDto, User>();
-            CreateMap<PatchUserDto, User>();
+            CreateMap<UserInternal, UserDto>();
+            CreateMap<CreateUserDto, UserInternal>();
+            CreateMap<PatchUserDto, UserInternal>();
 
             CreateMap<StoreItem, StoreItemDto>();
             CreateMap<CreateStoreItemDto, StoreItem>();
@@ -35,6 +36,8 @@ namespace MartynasDRestAPI.Data
 
             CreateMap<InventoryItem, InventoryItemDto>();
             CreateMap<InventoryItemDto, InventoryItem>();
+
+            CreateMap<RestUser, RestUserDto>();
 
         }
     }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
@@ -13,6 +15,7 @@ namespace MartynasDRestAPI.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize(Roles = RestUserRoles.Admin)]
     public class UserController : ControllerBase
     {
         private readonly  IUsersRepository _usersRepository;
@@ -41,7 +44,7 @@ namespace MartynasDRestAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<UserDto>> Post(CreateUserDto dto)
         {
-            var user = _mapper.Map<User>(dto);
+            var user = _mapper.Map<UserInternal>(dto);
             await _usersRepository.Create(user);
 
             // 201 Created

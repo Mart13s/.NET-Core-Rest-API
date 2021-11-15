@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -27,6 +29,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAll(int userID)
         {
             if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
@@ -35,6 +38,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Get(int userID, int id)
         {
             if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
@@ -45,6 +49,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Create(int userID, InventoryItemDto dto)
         {
             var usr = await _userRepository.Get(userID);
@@ -59,6 +64,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Patch(int userID, int id, InventoryItemDto dto)
         {
             var usr = await _userRepository.Get(userID);
@@ -81,6 +87,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult> Delete(int userID, int id)
         {
             if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");

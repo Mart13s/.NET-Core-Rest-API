@@ -30,7 +30,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
             
-            if(user != default(User))
+            if(user != default(UserInternal))
             {
                 return await _restApiContext.inventoryItems.Where(o => o.owner == user).ToListAsync();
             }
@@ -42,7 +42,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = await _restApiContext.users.Where(o => o.id == inventoryID).FirstOrDefaultAsync();
 
-            if (user != default(User))
+            if (user != default(UserInternal))
             {
                 return await _restApiContext.inventoryItems
                     .FirstOrDefaultAsync(o => o.owner == user && o.id == id);
@@ -62,7 +62,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
 
-            if(user != default(User))
+            if(user != default(UserInternal))
             {
                 invItem.owner = user;
                 _restApiContext.inventoryItems.Add(invItem);
@@ -78,7 +78,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
 
-            if (user != default(User))
+            if (user != default(UserInternal))
             {
                 var item = await _restApiContext.inventoryItems.FirstOrDefaultAsync(o => o == invItem);
                 if (item != null && item.owner == user)
@@ -106,7 +106,7 @@ namespace MartynasDRestAPI.Data.Repositories
         {
             var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
 
-            if (user != default(User))
+            if (user != default(UserInternal))
             {
                 var item = await _restApiContext.inventoryItems
                     .FirstOrDefaultAsync(o => o.owner == user && o.id == id);

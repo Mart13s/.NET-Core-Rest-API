@@ -12,7 +12,7 @@ namespace MartynasDRestAPI.Data.Entities
 
         [ForeignKey("buyer")]
         public int buyerID { get; set; }
-        public User buyer { get; set; }
+        public UserInternal buyer { get; set; }
         public List<PurchaseItem> items { get; set; }
         public Decimal totalCost { get; set; }
         public int totalItemCount { get; set; }
