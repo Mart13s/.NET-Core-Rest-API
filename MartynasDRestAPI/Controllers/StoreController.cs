@@ -17,7 +17,7 @@ namespace MartynasDRestAPI.Controllers
     [Route("api/store")]
     public class StoreController : ControllerBase
     {
-        private readonly  IStoreItemsRepository _storeRepository;
+        private readonly IStoreItemsRepository _storeRepository;
         private readonly IMapper _mapper;
 
         public StoreController(IStoreItemsRepository storeRepository, IMapper mapper)

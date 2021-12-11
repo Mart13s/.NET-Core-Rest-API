@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
+using MartynasDRestAPI.Data.Dtos.Auth;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,13 +20,14 @@ namespace MartynasDRestAPI.Controllers
     {
 
         private readonly IInventoryRepository _inventoryRepository;
-        private readonly IUsersRepository _userRepository;
+        //private readonly IUsersRepository _userRepository;
+        private readonly UserManager<RestUser> _userManager;
         private readonly IMapper _mapper;
 
-        public InventoryController(IInventoryRepository inventoryRepository, IUsersRepository userRepository, IMapper mapper)
+        public InventoryController(IInventoryRepository inventoryRepository, UserManager<RestUser> userManager, IMapper mapper)
         {
             _inventoryRepository = inventoryRepository;
-            _userRepository = userRepository;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
@@ -32,7 +35,7 @@ namespace MartynasDRestAPI.Controllers
         [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetAll(int userID)
         {
-            if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
+            if (await _userManager.FindByIdAsync(userID.ToString() ) == null) return NotFound($" User with id {userID} not found. ");
 
             return Ok((await _inventoryRepository.GetAll(userID)).Select(o => _mapper.Map<InventoryItemDto>(o)));
         }
@@ -41,7 +44,7 @@ namespace MartynasDRestAPI.Controllers
         [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Get(int userID, int id)
         {
-            if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
+            if (await _userManager.FindByIdAsync(userID.ToString()) == null) return NotFound($" User with id {userID} not found. ");
             var invItem = _inventoryRepository.Get(userID, id);
             if (invItem == null) return NotFound($"Inventory item with id {id} not found.");
 
@@ -52,8 +55,10 @@ namespace MartynasDRestAPI.Controllers
         [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Create(int userID, InventoryItemDto dto)
         {
-            var usr = await _userRepository.Get(userID);
+            var usr = await _userManager.FindByIdAsync(userID.ToString());
             if (usr == null) return NotFound($" User with id {userID} not found. ");
+
+            dto.id = default(int);
             var invItem = _mapper.Map<InventoryItem>(dto);
             invItem.owner = usr;
             invItem.ownerID = userID;
@@ -67,7 +72,7 @@ namespace MartynasDRestAPI.Controllers
         [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Patch(int userID, int id, InventoryItemDto dto)
         {
-            var usr = await _userRepository.Get(userID);
+            var usr = await _userManager.FindByIdAsync(userID.ToString());
             if (usr == null) return NotFound($" User with id {userID} not found. ");
 
             var invItem = await _inventoryRepository.Get(userID, id);
@@ -90,7 +95,7 @@ namespace MartynasDRestAPI.Controllers
         [Authorize(Roles = RestUserRoles.Admin)]
         public async Task<ActionResult> Delete(int userID, int id)
         {
-            if (await _userRepository.Get(userID) == null) return NotFound($" User with id {userID} not found. ");
+            if (await _userManager.FindByIdAsync(userID.ToString()) == null) return NotFound($" User with id {userID} not found. ");
 
             var invItem = await _inventoryRepository.Get(userID, id);
             if (invItem == null) return NotFound($" Inventory item with id {id} not found.");

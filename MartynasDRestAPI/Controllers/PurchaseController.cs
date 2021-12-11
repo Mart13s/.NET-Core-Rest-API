@@ -6,9 +6,11 @@ using AutoMapper;
 using AutoMapper.Configuration.Annotations;
 using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
+using MartynasDRestAPI.Data.Dtos.Auth;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MartynasDRestAPI.Controllers
@@ -19,16 +21,16 @@ namespace MartynasDRestAPI.Controllers
     public class PurchaseController : ControllerBase
     {
         private readonly IPurchaseRepository _purchaseRepository;
-        private readonly IUsersRepository _usersRepository;
+        private readonly UserManager<RestUser> _userManager;
         private readonly IStoreItemsRepository _storeItemsRepository;
         private readonly IPurchaseItemsRepository _purchaseItemsRepository;
         private readonly IMapper _mapper;
 
-        public PurchaseController(IPurchaseItemsRepository purchaseItemsRepository, IPurchaseRepository purchaseRepository, IUsersRepository usersRepository, IStoreItemsRepository storeItemsRepository, IMapper mapper)
+        public PurchaseController(UserManager<RestUser> userManager, IPurchaseItemsRepository purchaseItemsRepository, IPurchaseRepository purchaseRepository, IStoreItemsRepository storeItemsRepository, IMapper mapper)
         {
             _purchaseItemsRepository = purchaseItemsRepository;
             _purchaseRepository = purchaseRepository;
-            _usersRepository = usersRepository;
+            _userManager = userManager;
             _storeItemsRepository = storeItemsRepository;
             _mapper = mapper;
         }
@@ -120,8 +122,8 @@ namespace MartynasDRestAPI.Controllers
         public async Task<ActionResult<PurchaseDto>> Create(CreatePurchaseDto dto)
         {
             int userid = dto.buyerID;
-            var buyer = await _usersRepository.Get(userid);
-            if (buyer == default(UserInternal)) return NotFound($" User with id {userid} not found.");
+            var buyer = await _userManager.FindByIdAsync(userid.ToString());
+            if (buyer == null) return NotFound($" User with id {userid} not found.");
 
             if (dto == null || dto.items.Count == 0) return BadRequest(" No items in purchase. ");
 
@@ -193,8 +195,8 @@ namespace MartynasDRestAPI.Controllers
         public async Task<ActionResult<PurchaseDto>> Patch(int id, PurchaseDto dto)
         {
             int userid = dto.buyerID;
-            var buyer = await _usersRepository.Get(userid);
-            if (buyer == default(UserInternal)) return NotFound($" User with id {userid} not found.");
+            var buyer = await _userManager.FindByIdAsync(userid.ToString());
+            if (buyer == null) return NotFound($" User with id {userid} not found.");
 
             var purchase = await _purchaseRepository.Get(id);
             if (purchase == null) return NotFound($" Purchase item with id '{id}' not found.");

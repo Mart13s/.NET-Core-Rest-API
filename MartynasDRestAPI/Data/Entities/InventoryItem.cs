@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MartynasDRestAPI.Data.Dtos.Auth;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MartynasDRestAPI.Data.Entities
 
         [ForeignKey("owner")]
         public int ownerID { get; set; }
-        public UserInternal owner { get; set; }
+        public RestUser owner { get; set; }
         public string itemName { get; set; }
         public string description { get; set; }
         public string imageUrl { get; set; }

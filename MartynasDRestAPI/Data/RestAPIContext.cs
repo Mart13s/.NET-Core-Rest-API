@@ -7,13 +7,14 @@ using MartynasDRestAPI.Data.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using MartynasDRestAPI.Data.Dtos.Auth;
 using Microsoft.AspNetCore.Identity;
+using MartynasDRestAPI.Auth.Model;
 
 namespace MartynasDRestAPI.Data
 {
-    public class RestAPIContext : IdentityDbContext<RestUser>
+    public class RestAPIContext : IdentityDbContext<RestUser, IdentityRole<int>, int>
     {
-        public DbSet<RestUser> identityUsers { get; set; }
-        public DbSet<UserInternal> users { get; set; }
+        public DbSet<RestUser> users { get; set; }
+        //public DbSet<UserInternal> users { get; set; }
         public DbSet<InventoryItem> inventoryItems { get; set; }
         public DbSet<StoreItem> storeItems { get; set; }
         public DbSet<Purchase> purchases { get; set; }
@@ -24,7 +25,8 @@ namespace MartynasDRestAPI.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=tcp:martynasdrestapidbserver.database.windows.net,1433;Initial Catalog=MartynasDRestAPI_db;User Id=AdminUser@martynasdrestapidbserver;Password=BruhBruh123");
+            //optionsBuilder.UseSqlServer("Data Source=tcp:martynasdrestapidbserver.database.windows.net,1433;Initial Catalog=MartynasDRestAPI_db;User Id=AdminUser@martynasdrestapidbserver;Password=BruhBruh123");
+            optionsBuilder.UseSqlServer("Data Source=(localDB)\\MSSQLLOCALDB; Initial Catalog=MartynasDApiDatabase");
         }
 
         // Overriding for composite keys

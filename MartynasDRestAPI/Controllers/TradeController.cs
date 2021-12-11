@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using MartynasDRestAPI.Auth.Model;
 using MartynasDRestAPI.Data.Dtos;
+using MartynasDRestAPI.Data.Dtos.Auth;
 using MartynasDRestAPI.Data.Entities;
 using MartynasDRestAPI.Data.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -20,12 +22,12 @@ namespace MartynasDRestAPI.Controllers
         private readonly ITradeRepository _tradeRepository;
         private readonly ITradeItemRepository _tradeItemRepository;
         private readonly IInventoryRepository _inventoryRepository;
-        private readonly IUsersRepository _usersRepository;
+        private readonly UserManager<RestUser> _userManager;
         private readonly IMapper _mapper;
 
-        public TradeController(ITradeRepository tradeRepository, IUsersRepository usersRepository, ITradeItemRepository tradeItemRepository, IInventoryRepository inventoryRepository, IMapper mapper)
+        public TradeController(ITradeRepository tradeRepository, UserManager<RestUser> userManager, ITradeItemRepository tradeItemRepository, IInventoryRepository inventoryRepository, IMapper mapper)
         {
-            _usersRepository = usersRepository;
+            _userManager = userManager;
             _tradeRepository = tradeRepository;
             _tradeItemRepository = tradeItemRepository;
             _inventoryRepository = inventoryRepository;
@@ -128,8 +130,8 @@ namespace MartynasDRestAPI.Controllers
 
 
             if (dto.senderID == dto.receiverID) return BadRequest(" Sender and receiver is the same user. ");
-            if ((await _usersRepository.Get(dto.senderID)) == null) return NotFound($" Sender with id {dto.senderID} not found.");
-            if ((await _usersRepository.Get(dto.receiverID)) == null) return NotFound($" Receiver with id {dto.receiverID} not found.");
+            if ((await _userManager.FindByIdAsync(dto.senderID.ToString())) == null) return NotFound($" Sender with id {dto.senderID} not found.");
+            if ((await _userManager.FindByIdAsync(dto.receiverID.ToString())) == null) return NotFound($" Receiver with id {dto.receiverID} not found.");
 
             if (( dto.senderItems == null || dto.senderItems.DefaultIfEmpty() == null)
                && (dto.receiverItems == null || dto.receiverItems.DefaultIfEmpty() == null))

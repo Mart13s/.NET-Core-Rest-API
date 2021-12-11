@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MartynasDRestAPI.Data.Dtos.Auth;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MartynasDRestAPI.Data.Entities
 
         [ForeignKey("buyer")]
         public int buyerID { get; set; }
-        public UserInternal buyer { get; set; }
+        public RestUser buyer { get; set; }
         public List<PurchaseItem> items { get; set; }
         public Decimal totalCost { get; set; }
         public int totalItemCount { get; set; }

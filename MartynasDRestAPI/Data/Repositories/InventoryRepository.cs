@@ -28,9 +28,9 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task<IEnumerable<InventoryItem>> GetAll(int inventoryID)
         {
-            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
+            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.Id == inventoryID);
             
-            if(user != default(UserInternal))
+            if(user != null)
             {
                 return await _restApiContext.inventoryItems.Where(o => o.owner == user).ToListAsync();
             }
@@ -40,9 +40,9 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task<InventoryItem> Get(int inventoryID, int id)
         {
-            var user = await _restApiContext.users.Where(o => o.id == inventoryID).FirstOrDefaultAsync();
+            var user = await _restApiContext.users.Where(o => o.Id == inventoryID).FirstOrDefaultAsync();
 
-            if (user != default(UserInternal))
+            if (user != null)
             {
                 return await _restApiContext.inventoryItems
                     .FirstOrDefaultAsync(o => o.owner == user && o.id == id);
@@ -60,9 +60,9 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task<InventoryItem> Create(int inventoryID, InventoryItem invItem)
         {
-            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
+            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.Id == inventoryID);
 
-            if(user != default(UserInternal))
+            if(user != null)
             {
                 invItem.owner = user;
                 _restApiContext.inventoryItems.Add(invItem);
@@ -76,9 +76,9 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task<InventoryItem> Patch(int inventoryID, InventoryItem invItem)
         {
-            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
+            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.Id == inventoryID);
 
-            if (user != default(UserInternal))
+            if (user != null)
             {
                 var item = await _restApiContext.inventoryItems.FirstOrDefaultAsync(o => o == invItem);
                 if (item != null && item.owner == user)
@@ -104,9 +104,9 @@ namespace MartynasDRestAPI.Data.Repositories
 
         public async Task Delete(int inventoryID, int id)
         {
-            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.id == inventoryID);
+            var user = await _restApiContext.users.FirstOrDefaultAsync(o => o.Id == inventoryID);
 
-            if (user != default(UserInternal))
+            if (user != null)
             {
                 var item = await _restApiContext.inventoryItems
                     .FirstOrDefaultAsync(o => o.owner == user && o.id == id);

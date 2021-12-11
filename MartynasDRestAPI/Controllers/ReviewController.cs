@@ -17,7 +17,7 @@ namespace MartynasDRestAPI.Controllers
     [Route("api/store/{storeItemId}/reviews")]
     public class ReviewController : ControllerBase
     {
-        private readonly  IReviewsRepository _reviewsRepository;
+        private readonly IReviewsRepository _reviewsRepository;
         private readonly IStoreItemsRepository _storeRepository;
         private readonly IMapper _mapper;
 
