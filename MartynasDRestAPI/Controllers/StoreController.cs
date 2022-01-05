@@ -27,14 +27,12 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<IEnumerable<StoreItemDto>> GetAll()
         {
             return (await _storeRepository.GetAll()).Select(o => _mapper.Map<StoreItemDto>(o));
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<StoreItemDto>> Get(int id)
         {
             var storeItem = await _storeRepository.Get(id);

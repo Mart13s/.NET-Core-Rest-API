@@ -31,7 +31,6 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetAll(int storeItemId)
         {
             if (await _storeRepository.Get(storeItemId) == null) return NotFound($" Store item with id {storeItemId} not found. ");
@@ -55,7 +54,6 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<ReviewDto>> Create(int storeItemId, CreateReviewDto dto )
         {
             var store = await _storeRepository.Get(storeItemId);

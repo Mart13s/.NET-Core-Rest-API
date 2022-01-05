@@ -34,6 +34,20 @@ namespace MartynasDRestAPI
                     .AddEntityFrameworkStores<RestAPIContext>()
                     .AddDefaultTokenProviders();
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyHeader();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyOrigin();
+                        builder.AllowCredentials();
+                        builder.WithOrigins("http://localhost:3000");
+                        builder.WithOrigins("https://martynasdfront.azurewebsites.net/");
+                    });
+            });
+
             services.AddAuthentication(
                 options =>
                 {
@@ -70,6 +84,7 @@ namespace MartynasDRestAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

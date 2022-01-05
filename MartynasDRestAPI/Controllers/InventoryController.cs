@@ -52,7 +52,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = RestUserRoles.Admin)]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<InventoryItemDto>> Create(int userID, InventoryItemDto dto)
         {
             var usr = await _userManager.FindByIdAsync(userID.ToString());

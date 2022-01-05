@@ -35,7 +35,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RestUserRoles.Admin)]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<TradeDto>>> GetAll()
         {
             var trades = await _tradeRepository.GetAll();

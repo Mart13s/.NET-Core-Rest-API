@@ -36,7 +36,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = RestUserRoles.Admin)]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<IEnumerable<PurchaseDto>>> GetAll()
         {
             var purchases = (await _purchaseRepository.GetAll());
@@ -80,7 +80,7 @@ namespace MartynasDRestAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = RestUserRoles.Admin)]
+        [Authorize(Roles = RestUserRoles.RegisteredCustomer + "," + RestUserRoles.Admin)]
         public async Task<ActionResult<PurchaseDto>> Get(int id)
         {
             var p = await _purchaseRepository.Get(id);
@@ -143,7 +143,7 @@ namespace MartynasDRestAPI.Controllers
                     {
                         purchaseID = p.id,
                         storeItemID = currentItem.id,
-                        count = currentItem.qty
+                        count = storeItem.qty
                     });
 
                 if (purchaseItem == null) return BadRequest($" Purchase item already exists. ");

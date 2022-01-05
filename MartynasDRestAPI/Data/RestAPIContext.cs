@@ -25,7 +25,7 @@ namespace MartynasDRestAPI.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("Data Source=tcp:martynasdrestapidbserver.database.windows.net,1433;Initial Catalog=MartynasDRestAPI_db;User Id=AdminUser@martynasdrestapidbserver;Password=BruhBruh123");
+            //optionsBuilder.UseSqlServer("Data Source=tcp:martynasdrestapidbserver.database.windows.net,1433;Initial Catalog=MartynasDRestAPI_db;User Id=AdminUser@martynasdrestapidbserver;Password=");
             optionsBuilder.UseSqlServer("Data Source=(localDB)\\MSSQLLOCALDB; Initial Catalog=MartynasDApiDatabase");
         }
 
